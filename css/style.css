@@ -1,0 +1,163 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	font-family: Myriad Pro, Arial;
+	font-size: 12pt;
+	color: #000;
+}
+
+*, *:before,*:after {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;
+}
+
+.header {
+	background-color: #353D90;
+	min-height: 80px;
+	color: #dfdfdf;
+	padding: 20px;
+}
+
+.header h1 {
+	margin: 0px;
+	padding-left: 10%;
+}
+
+fieldset {
+	border: 1px solid #CBCBCB;
+	background-color: #E7E7E7;
+	margin: 20px 0px;
+	padding: 30px;
+}
+
+fieldset legend {
+	border: 1px solid #CBCBCB;
+	background-color: #51A49D;
+	font-weight: bold;
+	padding: 10px;
+	color: #efefef;
+}
+
+
+label, input:not([type="checkbox"]):not([type="radio"])  {
+	display: block;
+}
+
+label {
+	text-transform: capitalize;
+	margin: 8px 0px;
+}
+
+input:not([type="submit"]) {
+	padding: 8px;
+}
+
+input[type="submit"],input[type="button"] {
+	border: 1px solid #cbcbcb;
+	background-color: #51A49D;
+	color: #efefef;
+	padding: 10px;
+	font-size: 1.3em;
+	cursor: pointer;
+}
+
+input[type="submit"]:hover,input[type="button"]:hover {
+	background-color: #e7e7e7;
+	color: #000;
+}
+
+input[type="text"].mini {
+	width: 50px;
+	display: inline;
+}
+
+.center {
+	margin: 0 auto;
+}
+
+.capitalize {
+	text-transform: capitalize;
+}
+
+.wrap {
+	margin: 0 auto;
+}
+
+.moduleDetails ul {
+	list-style: none;
+}
+
+@media (min-width: 768px) {
+  .wrap {
+    max-width: 750px;
+  }
+	.moduleDetails {
+		display: inline-block;
+		width: 49%;
+		vertical-align: top;
+	}
+ 	fieldset .col {
+		float:left;
+		width:50%;
+	}
+}
+
+@media (min-width: 992px) {
+	.wrap {
+		max-width: 970px;
+	}
+
+	fieldset {
+		display: inline-block;
+		width: 49%;
+		min-height: 410px;
+		vertical-align: top;
+	}
+
+	.moduleDetails {
+		display: inline-block;
+		width: 49%;
+		vertical-align: top;
+	}
+
+ 	fieldset .col {
+		float:left;
+		width:50%;
+	}
+}
+
+@media (min-width: 1200px) {
+	.wrap {
+		max-width: 1170px;
+	}
+
+	fieldset {
+		display: inline-block;
+		width: 49%;
+		min-height: 410px;
+		vertical-align: top;
+	}
+
+	.moduleDetails {
+		display: inline-block;
+		width: 49%;
+		vertical-align: top;
+	}
+ 	fieldset .col {
+		float:left;
+		width:50%;
+	}
+
+}
+
+.wrap:before, .wrap:after {
+	content: " ";
+	display: table;
+}
+
+.message {
+	font-weight: bold;
+	text-align: center;
+	margin: 20px;
+}
