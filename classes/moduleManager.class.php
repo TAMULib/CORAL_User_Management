@@ -24,7 +24,7 @@ class moduleManager {
 	//get the privileges from the DB for the given module
 	private function getConf($module) {
 		//exclude admin privilegeID
-		$sql = "SELECT * FROM `coral_{$module}_prod`.`privilege` WHERE `privilegeID` != 1 ORDER BY `privilegeID`";
+		$sql = "SELECT * FROM `demo_coral_{$module}`.`Privilege` WHERE `privilegeID` != 1 ORDER BY `privilegeID`";
 		if ($result = mysql_query($sql)) {
 			$temp = array();
 			while ($row = mysql_fetch_array($result,MYSQL_ASSOC)) {
@@ -55,14 +55,14 @@ class moduleManager {
 		$data['userdata']['password'] = $util->hashString('sha512', $prefix.$data['userdata']['password']);
 		$error = NULL;
 		//insert into user table of the auth module
-		$sql = "INSERT INTO `coral_auth_prod`.`user` SET `loginID`='".mysql_real_escape_string($data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
+		$sql = "INSERT INTO `demo_coral_auth`.`User` SET `loginID`='".mysql_real_escape_string($data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
 		if (mysql_query($sql)) {
 			unset($data['userdata']['password']);
 			//loop through module names
 			foreach ($data['modules'] as $module) {
 				if (in_array($module,$this->moduleNames)) {
 					//insert into user table for the current module
-					$sql = "INSERT INTO `coral_{$module}_prod`.`user` SET ";
+					$sql = "INSERT INTO `demo_coral_{$module}`.`User` SET ";
 					foreach ($data['userdata'] as $field=>$val) {
 						$sql .= "`{$field}`='".mysql_real_escape_string($val)."',";
 					}
@@ -90,7 +90,7 @@ class moduleManager {
 		$x = 1;
 		foreach ($this->moduleNames as $module) {
 			$meta['fields'] .= " l{$x}.`loginID`,";
-			$meta['tables'] .= " `coral_{$module}_prod`.`user` l{$x},";
+			$meta['tables'] .= " `demo_coral_{$module}`.`User` l{$x},";
 			$meta['params'] .= " l{$x}.`loginID`,";
 			$x++;
 		}
