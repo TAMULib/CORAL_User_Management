@@ -60,6 +60,9 @@ if ($_POST['request']) {
 	}
 } 
 if ($sysMsg) {
+	if ($sysMsg == 'User created.') {
+		$sysMsg = $sysMsg . '<br><a href="http://coraldemo.library.tamu.edu/">Click Here to return to CORAL</a>.';
+	}
 	echo '<div class="message">'.$sysMsg.'</div>';
 }
 //show request form if we have no request or a request with errors
