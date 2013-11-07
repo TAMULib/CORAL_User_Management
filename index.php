@@ -17,7 +17,6 @@ include "conf/conf.php";
 		<div class="wrap">
 			<div class="content">
 <?php
-$mods->userExists('coral');
 //validate and process request
 if ($_POST['request']) {
 	//make sure we have all data about the user
@@ -30,9 +29,9 @@ if ($_POST['request']) {
 	//make sure we're error free and have at least one module to work with
 	if (!$valError && is_array($_POST['request']['modules'])) {
 		$flag = 0;
-		//make sure each requested module has a requested privilege level and that they haven't hacked in the admin level
+		//make sure each requested module has a requested privilege level
 		foreach ($_POST['request']['modules'] as $name) {
-			 if ($_POST['request']['modulePrivilege'][$name] && $_POST['request']['modulePrivilege'][$name] != 1) {
+			 if ($_POST['request']['modulePrivilege'][$name]) {
 				$flag++;
 			}
 		}
@@ -47,7 +46,7 @@ if ($_POST['request']) {
 		if (!($userExists = $mods->userExists($_POST['request']['userdata']['loginID']))) {
 			//create the user
 			if ($mods->processRequest($_POST['request'])) {
-				$sysMsg = 'User created.';
+				$sysMsg = 'User created.<br /><a href="http://coraldemo.library.tamu.edu/">Click Here to return to CORAL</a>';
 				//send confirmation emails here
 			} else {
 				$sysMsg = 'Error creating user.';
@@ -60,9 +59,6 @@ if ($_POST['request']) {
 	}
 } 
 if ($sysMsg) {
-	if ($sysMsg == 'User created.') {
-		$sysMsg = $sysMsg . '<br><a href="http://coraldemo.library.tamu.edu/">Click Here to return to CORAL</a>.';
-	}
 	echo '<div class="message">'.$sysMsg.'</div>';
 }
 //show request form if we have no request or a request with errors
@@ -92,7 +88,7 @@ if (!$_POST['request'] || $valError || $userExists) {
 					<fieldset>
 						<legend>Access Information</legend>
 						<label for="request[modules][]">Select Modules</label>';
-	foreach ($mods->getModuleConfs() as $name=>$privileges) {
+	foreach ($mods->getModulePrivileges() as $name=>$privileges) {
 		echo "			<div class=\"moduleDetails\">
 							<input class=\"jqModule\" type=\"checkbox\" name=\"request[modules][]\" id=\"module_{$name}\" value=\"{$name}\"".(($_POST['request']['modules'] && in_array($name,$_POST['request']['modules'])) ? ' checked="checked"':'')." /> <span class=\"capitalize\">{$name}</span>
 							<ul>";

@@ -1,30 +1,40 @@
 <?php
+
 /* A class that provides the CORAL module names and metadata and automates user account creation across modules - Jason Savell
 */
 class moduleManager {
 	private $moduleNames;
-	private $moduleConfs;
+	private $moduleDBs;
+	private $modulePrivileges;
 
-	function __construct($names = NULL) {
-		if ($names) {
+	function __construct($config = NULL) {
+		if ($config) {
+			$names = array_keys($config);
 			$this->setModuleNames($names);
+			//use module dbName from $config, if provided
+			foreach ($config as $module=>$details) {
+				$this->setModuleDB($module,($details['dbName']) ? $details['dbName']:"coral_{$module}_prod");
+			}
 		} else {
 			$this->setModuleNames(array('licensing','management','organizations','resources'));
+			foreach ($this->moduleNames as $module) {
+				$this->setModuleDB($module,"coral_{$module}_prod");
+			}
 		}
-		$this->buildModuleConfs();		
+		$this->buildModulePrivileges();	
 	}
 
 	//build an array of module configurations
-	private function buildModuleConfs() {
+	private function buildModulePrivileges() {
 		foreach ($this->moduleNames as $module) {
-			$this->moduleConfs[$module] = $this->getConf($module);
+			$this->modulePrivileges[$module] = $this->getPrivilege($module);
 		}
 	}
 
 	//get the privileges from the DB for the given module
-	private function getConf($module) {
+	private function getPrivilege($module) {
 		//exclude admin privilegeID
-		$sql = "SELECT * FROM `demo_coral_{$module}`.`Privilege` WHERE `privilegeID` != 1 ORDER BY `privilegeID`";
+		$sql = "SELECT * FROM `{$this->moduleDBs[$module]}`.`Privilege` ORDER BY `privilegeID`";
 		if ($result = mysql_query($sql)) {
 			$temp = array();
 			while ($row = mysql_fetch_array($result,MYSQL_ASSOC)) {
@@ -35,6 +45,10 @@ class moduleManager {
 		return false;
 	}
 
+	private function setModuleDB($name,$db) {
+		$this->moduleDBs[$name] = $db;
+	}
+
 	public function getModuleNames() {
 		return $this->moduleNames();
 	}
@@ -43,8 +57,8 @@ class moduleManager {
 		$this->moduleNames = $names;
 	}
 
-	public function getModuleConfs() {
-		return $this->moduleConfs;
+	public function getModulePrivileges() {
+		return $this->modulePrivileges;
 	}
 
 	//add new user to each requested module
@@ -55,14 +69,14 @@ class moduleManager {
 		$data['userdata']['password'] = $util->hashString('sha512', $prefix.$data['userdata']['password']);
 		$error = NULL;
 		//insert into user table of the auth module
-		$sql = "INSERT INTO `demo_coral_auth`.`User` SET `loginID`='".mysql_real_escape_string($data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
+		$sql = "INSERT INTO `coral_auth_prod`.`User` SET `loginID`='".mysql_real_escape_string($data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
 		if (mysql_query($sql)) {
 			unset($data['userdata']['password']);
 			//loop through module names
 			foreach ($data['modules'] as $module) {
 				if (in_array($module,$this->moduleNames)) {
 					//insert into user table for the current module
-					$sql = "INSERT INTO `demo_coral_{$module}`.`User` SET ";
+					$sql = "INSERT INTO `{$this->moduleDBs[$module]}`.`User` SET ";
 					foreach ($data['userdata'] as $field=>$val) {
 						$sql .= "`{$field}`='".mysql_real_escape_string($val)."',";
 					}
@@ -90,7 +104,7 @@ class moduleManager {
 		$x = 1;
 		foreach ($this->moduleNames as $module) {
 			$meta['fields'] .= " l{$x}.`loginID`,";
-			$meta['tables'] .= " `demo_coral_{$module}`.`User` l{$x},";
+			$meta['tables'] .= " `{$this->moduleDBs[$module]}`.`User` l{$x},";
 			$meta['params'] .= " l{$x}.`loginID`,";
 			$x++;
 		}

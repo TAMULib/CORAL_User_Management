@@ -10,6 +10,12 @@ $config['path_css'] = "{$config['path_base']}css/";
 $config['path_js'] = "{$config['path_base']}js/";
 $config['title'] = "CORAL Demo Access Request";
 
+// (optionally) define the module names and their respective DBs
+/*
+$config['modules'] = array('licensing'=>array('dbName'=>'coral_licensing_prod'),
+							'organizations'=>array('dbName'=>'coral_organizations_prod'),
+							'resources'=>array('dbName'=>'coral_resources_prod'));
+*/
 $host = "mysql2.l";
 $username = "democoral";
 $password = "";
@@ -30,6 +36,9 @@ function __autoload($name) {
 	}
 }
 
-$mods = new moduleManager(array('licensing','organizations','resources'));
-
+if ($config['modules']) {
+	$mods = new moduleManager($config['modules']);
+} else {
+	$mods = new moduleManager();
+}
 ?>
