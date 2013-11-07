@@ -12,9 +12,10 @@ $config['title'] = "CORAL Demo Access Request";
 
 // (optionally) define the module names and their respective DBs
 /*
-$config['modules'] = array('licensing'=>array('dbName'=>'coral_licensing_prod'),
+$config['modules'] = array('auth'=>array('dbName'=>'coral_auth_prod'),'licensing'=>array('dbName'=>'coral_licensing_prod'),
 							'organizations'=>array('dbName'=>'coral_organizations_prod'),
 							'resources'=>array('dbName'=>'coral_resources_prod'));
+
 */
 $host = "mysql2.l";
 $username = "democoral";

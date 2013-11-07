@@ -18,7 +18,7 @@
 		});
 
 		$("#makeRequest").submit(function() {
-			if ($("#jqMath").val() == "five") {
+			if ($("#jqMath").val().toLowerCase() == "five") {
 				var error = false;
 				$("input[type=\"text\"]").each(function() {
 					if (!$(this).val()) {

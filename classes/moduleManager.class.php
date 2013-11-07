@@ -3,12 +3,19 @@
 /* A class that provides the CORAL module names and metadata and automates user account creation across modules - Jason Savell
 */
 class moduleManager {
+	private $authModuleDB;
 	private $moduleNames;
 	private $moduleDBs;
 	private $modulePrivileges;
 
 	function __construct($config = NULL) {
 		if ($config) {
+			if ($config['auth'] && $config['auth']['dbName']) {
+				$this->setAuthModuleDB($config['auth']['dbName']);
+				unset($config['auth']);
+			} else {
+				$this->setAuthModuleDB = 'coral_auth_prod';
+			}
 			$names = array_keys($config);
 			$this->setModuleNames($names);
 			//use module dbName from $config, if provided
@@ -16,12 +23,13 @@ class moduleManager {
 				$this->setModuleDB($module,($details['dbName']) ? $details['dbName']:"coral_{$module}_prod");
 			}
 		} else {
+			$this->setAuthModuleDB = 'coral_auth_prod';
 			$this->setModuleNames(array('licensing','management','organizations','resources'));
 			foreach ($this->moduleNames as $module) {
 				$this->setModuleDB($module,"coral_{$module}_prod");
 			}
 		}
-		$this->buildModulePrivileges();	
+		$this->buildModulePrivileges();
 	}
 
 	//build an array of module configurations
@@ -43,6 +51,10 @@ class moduleManager {
 			return $temp;
 		}
 		return false;
+	}
+
+	private function setAuthModuleDB($db) {
+		$this->authModuleDB = $db;
 	}
 
 	private function setModuleDB($name,$db) {
@@ -69,7 +81,7 @@ class moduleManager {
 		$data['userdata']['password'] = $util->hashString('sha512', $prefix.$data['userdata']['password']);
 		$error = NULL;
 		//insert into user table of the auth module
-		$sql = "INSERT INTO `coral_auth_prod`.`User` SET `loginID`='".mysql_real_escape_string($data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
+		$sql = "INSERT INTO `{$this->authModuleDB}`.`User` SET `loginID`='".mysql_real_escape_string($data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
 		if (mysql_query($sql)) {
 			unset($data['userdata']['password']);
 			//loop through module names
