@@ -14,8 +14,7 @@ $config['title'] = "CORAL Demo Access Request";
 /*
 $config['modules'] = array('auth'=>array('dbName'=>'coral_auth_prod'),'licensing'=>array('dbName'=>'coral_licensing_prod'),
 							'organizations'=>array('dbName'=>'coral_organizations_prod'),
-							'resources'=>array('dbName'=>'coral_resources_prod'));
-
+							'resources'=>array('dbName'=>'coral_resources_prod'),'usage'=>array('dbName'=>'coral_usage_prod'));
 */
 $host = "mysql2.l";
 $username = "democoral";

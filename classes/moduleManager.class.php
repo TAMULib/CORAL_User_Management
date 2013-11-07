@@ -24,7 +24,7 @@ class moduleManager {
 			}
 		} else {
 			$this->setAuthModuleDB = 'coral_auth_prod';
-			$this->setModuleNames(array('licensing','management','organizations','resources'));
+			$this->setModuleNames(array('licensing','management','organizations','resources','usage'));
 			foreach ($this->moduleNames as $module) {
 				$this->setModuleDB($module,"coral_{$module}_prod");
 			}
