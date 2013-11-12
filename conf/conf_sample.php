@@ -10,6 +10,8 @@ $config['path_css'] = "{$config['path_base']}css/";
 $config['path_js'] = "{$config['path_base']}js/";
 $config['title'] = "CORAL Demo Access Request";
 
+$config['adminEmail'] = "";
+
 // (optionally) define the module names and their respective DBs
 /*
 $config['modules'] = array('auth'=>array('dbName'=>'coral_auth_prod'),'licensing'=>array('dbName'=>'coral_licensing_prod'),

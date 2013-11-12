@@ -47,7 +47,24 @@ if ($_POST['request']) {
 			//create the user
 			if ($mods->processRequest($_POST['request'])) {
 				$sysMsg = 'User created.<br /><a href="http://coraldemo.library.tamu.edu/">Click Here to return to CORAL</a>';
-				//send confirmation emails here
+				//send confirmation emails
+				$message = "Hello {$_POST['request']['firstName']},\r\n\r\n
+Here are your credentials for the demo site.
+\r\n\r\n
+username: {$_POST['request']['loginID']}\r\n
+password: {$_POST['request']['passwrod']}\r\n
+\r\n
+Please let us know if you have any other questions.\r\n
+Regards";
+				mail($_POST['request']['extras']['email'],"CORAL Demo Access",$message);
+				if ($config['adminEmail']) {
+					$message = "A new user was added to the CORAL Demo site:\r\n\r\n
+username: {$_POST['request']['loginID']}\r\n
+name: {$_POST['request']['firstName']} {$_POST['request']['lastName']}\r\n
+email: {$_POST['request']['extras']['email']}";
+					mail($config['adminEmail'],"CORAL Demo User Added",$message);
+				}
+				unset($message);
 			} else {
 				$sysMsg = 'Error creating user.';
 			}
