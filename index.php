@@ -48,21 +48,29 @@ if ($_POST['request']) {
 			if ($mods->processRequest($_POST['request'])) {
 				$sysMsg = 'User created.<br /><a href="http://coraldemo.library.tamu.edu/">Click Here to return to CORAL</a>';
 				//send confirmation emails
-				$message = "Hello {$_POST['request']['firstName']},\r\n\r\n
+				$message = "Hello {$_POST['request']['userdata']['firstName']},\r\n\r\n
 Here are your credentials for the demo site.
 \r\n\r\n
-username: {$_POST['request']['loginID']}\r\n
-password: {$_POST['request']['passwrod']}\r\n
+username: {$_POST['request']['userdata']['loginID']}\r\n
+password: {$_POST['request']['userdata']['password']}\r\n
 \r\n
 Please let us know if you have any other questions.\r\n
 Regards";
-				mail($_POST['request']['extras']['email'],"CORAL Demo Access",$message);
+
+$headers = 	 "From: noreply@library.tamu.edu" . "\r\n" 
+		   . "Reply-To: noreply@library.tamu.edu" . "\r\n"
+		   . "Date: " . date("D, d M Y H:i:s O") . " \r\n"
+		   . "X-Mailer: Cmail_v2.0 \r\n"
+		   . "X-Originating-IP: " . "coraldemo.library.tamu.edu" . " \r\n";
+			
+				mail($_POST['request']['extras']['email'],"CORAL Demo Access",$message, $headers);
 				if ($config['adminEmail']) {
 					$message = "A new user was added to the CORAL Demo site:\r\n\r\n
-username: {$_POST['request']['loginID']}\r\n
-name: {$_POST['request']['firstName']} {$_POST['request']['lastName']}\r\n
-email: {$_POST['request']['extras']['email']}";
-					mail($config['adminEmail'],"CORAL Demo User Added",$message);
+username: {$_POST['request']['userdata']['loginID']}\r\n
+name: {$_POST['request']['userdata']['firstName']} {$_POST['request']['userdata']['lastName']}\r\n
+email: {$_POST['request']['extras']['email']}\r\n
+affiliation: {$_POST['request']['extras']['affiliation']}";
+					mail($config['adminEmail'],"CORAL Demo User Added",$message, $headers);
 				}
 				unset($message);
 			} else {
@@ -92,6 +100,9 @@ if (!$_POST['request'] || $valError || $userExists) {
 							<input type="text" name="request[userdata][loginID]" id="user" value="'.$_POST['request']['userdata']['loginID'].'" />
 							<label for="request[extras][email]">Email</label>
 							<input type="text" name="request[extras][email]" id="email" value="'.$_POST['request']['extras']['email'].'"/>
+							<label for="request[extras][affiliation]">Affiliation</label>
+							<input type="text" name="request[extras][affiliation]" id="affiliation" value="'.$_POST['request']['extras']['affiliation'].'"/>
+							
 						</div>
 						<div class="col">
 							<label for="request[userdata][password]">Password</label>
