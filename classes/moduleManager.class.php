@@ -41,11 +41,14 @@ class moduleManager {
 
 	//get the privileges from the DB for the given module
 	private function getPrivilege($module) {
+		global $db_link;
 		//exclude admin privilegeID
 		$sql = "SELECT * FROM `{$this->moduleDBs[$module]}`.`Privilege` ORDER BY `privilegeID`";
-		if ($result = mysql_query($sql)) {
+		
+		if ($result = mysqli_query($db_link, $sql)) {
+//			var_dump($result);
 			$temp = array();
-			while ($row = mysql_fetch_array($result,MYSQL_ASSOC)) {
+			while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
 				$temp[$row['privilegeID']] = $row;
 			}
 			return $temp;
@@ -75,14 +78,16 @@ class moduleManager {
 
 	//add new user to each requested module
 	public function processRequest($data) {
+		global $db_link;
 		//hashnsalt password with CORAL Utility class
 		$util = new Utility();
 		$prefix = $util->randomString(45);
 		$data['userdata']['password'] = $util->hashString('sha512', $prefix.$data['userdata']['password']);
 		$error = NULL;
 		//insert into user table of the auth module
-		$sql = "INSERT INTO `{$this->authModuleDB}`.`User` SET `loginID`='".mysql_real_escape_string($data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
-		if (mysql_query($sql)) {
+		$sql = "INSERT INTO `{$this->authModuleDB}`.`User` SET `loginID`='".mysqli_real_escape_string($db_link, $data['userdata']['loginID'])."',`password`='{$data['userdata']['password']}',`adminInd`='N',`passwordPrefix`='{$prefix}'";
+		
+		if (mysqli_query($db_link, $sql)) {
 			unset($data['userdata']['password']);
 			//loop through module names
 			foreach ($data['modules'] as $module) {
@@ -90,16 +95,16 @@ class moduleManager {
 					//insert into user table for the current module
 					$sql = "INSERT INTO `{$this->moduleDBs[$module]}`.`User` SET ";
 					foreach ($data['userdata'] as $field=>$val) {
-						$sql .= "`{$field}`='".mysql_real_escape_string($val)."',";
+						$sql .= "`{$field}`='".mysqli_real_escape_string($db_link, $val)."',";
 					}
 					$sql = rtrim($sql,',');
 					if ($data['modulePrivilege'][$module]) {
-						$sql .= ",`privilegeID`=".mysql_real_escape_string($data['modulePrivilege'][$module]);
+						$sql .= ",`privilegeID`=".mysqli_real_escape_string($db_link, $data['modulePrivilege'][$module]);
 					}
 					if ($module == 'resources') {
-						$sql .= ",`emailAddress`='".mysql_real_escape_string($data['extras']['email'])."'";
+						$sql .= ",`emailAddress`='".mysqli_real_escape_string($db_link, $data['extras']['email'])."'";
 					}
-					if (!mysql_query($sql)) {
+					if (!mysqli_query($db_link, $sql)) {
 						$error[] = $module;
 					}
 				}
@@ -113,22 +118,19 @@ class moduleManager {
 
 	//boolean check for username availability
 	function userExists($loginID) {
+		global $db_link;
 		$x = 1;
+		
+		$sql = "SELECT ";
+		
 		foreach ($this->moduleNames as $module) {
-			$meta['fields'] .= " l{$x}.`loginID`,";
-			$meta['tables'] .= " `{$this->moduleDBs[$module]}`.`User` l{$x},";
-			$meta['params'] .= " l{$x}.`loginID`,";
-			$x++;
+			$sql = $sql . "`loginID` FROM `{$this->moduleDBs[$module]}`.`User`  WHERE `loginID` = '".mysqli_real_escape_string($db_link, $loginID)."'";
+			$sql = $sql . "UNION SELECT ";
 		}
-		foreach ($meta as $field=>$val) {
-			$meta[$field] = rtrim($val,',');
-		}
-		$sql = "SELECT {$meta['fields']}
-					FROM {$meta['tables']}
-					WHERE '".mysql_real_escape_string($loginID)."' IN ({$meta['params']}) LIMIT 0,1";
+		$sql = rtrim($sql, "UNION SELECT ");
 
-		$result = mysql_query($sql);
-		if (mysql_num_rows($result) > 0) {
+		$result = mysqli_query($db_link, $sql);
+		if (mysqli_num_rows($result) > 0) {
 			return true;
 		}
 		return false;

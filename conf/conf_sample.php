@@ -3,27 +3,37 @@
 // Copy this file to conf.php and make appropriate changes.
 //
 //
-$config['path_root'] = "/data/apps/coraldemo/";
-$config['path_file'] = "{$config['path_root']}coral-demo-requests/";
-$config['path_base'] = "http://coraldemo.library.tamu.edu/usermanagement/";
+
+$config['path_root'] = "/var/www/html/";
+$config['path_file'] = "{$config['path_root']}usermanagement/";
+$config['path_base'] = "https://coraldemo.library.tamu.edu/usermanagement/";
+//$config['path_http'] = "index.php";
 $config['path_css'] = "{$config['path_base']}css/";
 $config['path_js'] = "{$config['path_base']}js/";
 $config['title'] = "CORAL Demo Access Request";
-
 $config['adminEmail'] = "";
 
 // (optionally) define the module names and their respective DBs
-/*
-$config['modules'] = array('auth'=>array('dbName'=>'coral_auth_prod'),'licensing'=>array('dbName'=>'coral_licensing_prod'),
-							'organizations'=>array('dbName'=>'coral_organizations_prod'),
-							'resources'=>array('dbName'=>'coral_resources_prod'),'usage'=>array('dbName'=>'coral_usage_prod'));
-*/
-$host = "mysql2.l";
-$username = "democoral";
+
+$config['modules'] = array(
+  'auth'=>array('dbName'=>'demo_coral_auth'),
+  'licensing'=>array('dbName'=>'demo_coral_licensing'),
+  'organizations'=>array('dbName'=>'demo_coral_organizations'),
+  'resources'=>array('dbName'=>'demo_coral_resources'),
+  'usage'=>array('dbName'=>'demo_coral_usage'),
+  'management'=>array('dbName'=>'demo_coral_management')  
+  );
+
+$host = "";
+$username = "";
 $password = "";
 
-if (!mysql_connect($host, $username, $password)) {
-	die('No connection: '.mysql_error());
+$db_link = mysqli_connect($host, $username, $password, 'demo_coral_auth');
+global $db_link;
+
+if (mysqli_connect_errno()) {
+    printf("Connect failed: %s\n", mysqli_connect_error());
+    exit();
 }
 
 function __autoload($name) {
@@ -39,8 +49,9 @@ function __autoload($name) {
 }
 
 if ($config['modules']) {
-	$mods = new moduleManager($config['modules']);
+    $mods = new moduleManager($config['modules']);
 } else {
-	$mods = new moduleManager();
+    $mods = new moduleManager();
 }
+
 ?>
